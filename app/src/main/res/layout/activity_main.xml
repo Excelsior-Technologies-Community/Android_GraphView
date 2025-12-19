@@ -16,7 +16,8 @@
         app:lineColor="@android:color/holo_blue_dark"
         app:axisColor="@android:color/black"
         app:textColor="@android:color/darker_gray"
-        app:showGrid="true" />
+        app:showGrid="true"
+        app:showLegend="true" />
 
 
 </LinearLayout>

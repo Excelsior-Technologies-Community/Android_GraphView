@@ -34,6 +34,7 @@ class LineGraphView @JvmOverloads constructor(
 
     private var lastTouchX = 0f
     private var lastTouchY = 0f
+    private var showLegend = true
 
 
 
@@ -86,6 +87,17 @@ class LineGraphView @JvmOverloads constructor(
             }
         })
 
+    private val legendTextPaint = Paint().apply {
+        color = Color.BLACK
+        textSize = 30f
+        isAntiAlias = true
+    }
+
+    private val legendBoxPaint = Paint().apply {
+        style = Paint.Style.FILL
+        isAntiAlias = true
+    }
+
 
 
     // ================= XML ATTRIBUTES =================
@@ -113,6 +125,12 @@ class LineGraphView @JvmOverloads constructor(
                 R.styleable.LineGraphView_showGrid,
                 false
             )
+
+            showLegend = typedArray.getBoolean(
+                R.styleable.LineGraphView_showLegend,
+                true
+            )
+
 
             typedArray.recycle()
         }
@@ -189,6 +207,9 @@ class LineGraphView @JvmOverloads constructor(
                 y - 50f,
                 tooltipPaint
             )
+        }
+        if (showLegend && lines.isNotEmpty()) {
+            drawLegend(canvas)
         }
         canvas.restore()
     }
@@ -406,6 +427,36 @@ class LineGraphView @JvmOverloads constructor(
             allY.minOrNull()!!,
             allY.maxOrNull()!!
         )
+    }
+
+    private fun drawLegend(canvas: Canvas) {
+        val startX = width - 250f
+        var startY = 80f
+
+        val boxSize = 30f
+        val spacing = 20f
+
+        lines.forEach { line ->
+            // Color box
+            legendBoxPaint.color = line.color
+            canvas.drawRect(
+                startX,
+                startY,
+                startX + boxSize,
+                startY + boxSize,
+                legendBoxPaint
+            )
+
+            // Label
+            canvas.drawText(
+                line.label,
+                startX + boxSize + 16f,
+                startY + boxSize - 6f,
+                legendTextPaint
+            )
+
+            startY += boxSize + spacing
+        }
     }
 
 

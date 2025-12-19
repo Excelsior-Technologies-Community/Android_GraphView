@@ -25,12 +25,14 @@ class MainActivity : AppCompatActivity() {
                 LineData(
                     xValues = listOf(0f, 1f, 2f, 3f),
                     yValues = listOf(10f, 40f, 20f, 60f),
-                    color = Color.RED
+                    color = Color.RED,
+                    label = "Revenue"
                 ),
                 LineData(
                     xValues = listOf(0f, 1f, 2f, 3f),
                     yValues = listOf(20f, 30f, 50f, 40f),
-                    color = Color.BLUE
+                    color = Color.BLUE,
+                    label = "Expenses"
                 )
             )
         )
