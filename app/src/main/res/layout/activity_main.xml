@@ -3,29 +3,65 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="@color/white"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.ext.graphview.LineGraphView
-        android:id="@+id/graph"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:lineColor="@android:color/holo_blue_dark"
-        app:axisColor="@android:color/black"
-        app:textColor="@android:color/darker_gray"
-        app:showGrid="true"
-        app:showLegend="true" />
+        android:layout_height="wrap_content"
+        android:overScrollMode="never">
 
-    <com.ext.graphview.BarGraphView
-        android:id="@+id/bargraph"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:showGrid="true"
-        app:barColor="@android:color/holo_orange_light"
-        app:showLegend="true"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.ext.graphview.LineGraphView
+                android:id="@+id/graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:axisColor="@android:color/holo_orange_light"
+                app:lineColor="@android:color/holo_blue_dark"
+                app:showGrid="true"
+                app:showLegend="true"
+                app:textColor="@android:color/darker_gray" />
+
+            <com.ext.graphview.BarGraphView
+                android:id="@+id/bargraph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:axisColor="@android:color/holo_blue_bright"
+                app:barColor="@android:color/holo_orange_light"
+                app:showGrid="false"
+                app:showLegend="true"
+                app:textColor="@color/black" />
+
+            <com.ext.graphview.LineGraphView
+                android:id="@+id/linegraph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:axisColor="@android:color/holo_orange_light"
+                app:lineColor="@android:color/holo_blue_dark"
+                app:showGrid="false"
+                app:showLegend="false"
+                app:textColor="@android:color/darker_gray" />
+
+            <com.ext.graphview.BarGraphView
+                android:id="@+id/bargraph1"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:axisColor="@android:color/holo_blue_bright"
+                app:barColor="@android:color/holo_orange_light"
+                app:showGrid="true"
+                app:showLegend="true"
+                app:textColor="@color/black" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 
 </LinearLayout>

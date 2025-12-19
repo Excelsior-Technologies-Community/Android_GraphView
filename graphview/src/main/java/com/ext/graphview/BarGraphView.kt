@@ -21,11 +21,18 @@ class BarGraphView @JvmOverloads constructor(
     private var touchedBar: Pair<Int, Int>? = null
     // Pair<datasetIndex, barIndex>
     private var defaultBarColor: Int = Color.BLUE
+    private var axisColor: Int = Color.BLACK
+    private var textColor: Int = Color.BLACK
+    private val leftPadding = 100f
+    private val rightPadding = 80f
+    private val topPadding = 80f
+    private val bottomPadding = 120f
+
 
 
     // ================= PAINTS =================
     private val axisPaint = Paint().apply {
-        color = Color.BLACK
+        color = axisColor
         strokeWidth = 4f
         isAntiAlias = true
     }
@@ -36,7 +43,7 @@ class BarGraphView @JvmOverloads constructor(
     }
 
     private val textPaint = Paint().apply {
-        color = Color.BLACK
+        color = textColor
         textSize = 28f
         isAntiAlias = true
     }
@@ -68,6 +75,8 @@ class BarGraphView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
+
+
     // ================= XML =================
     init {
         attrs?.let {
@@ -82,7 +91,21 @@ class BarGraphView @JvmOverloads constructor(
                 Color.BLUE
             )
 
+            axisColor = ta.getColor(
+                R.styleable.LineGraphView_axisColor,
+                Color.BLACK
+            )
+
+            // ✅ TEXT COLOR FROM XML
+            textColor = ta.getColor(
+                R.styleable.LineGraphView_textColor,
+                Color.BLACK
+            )
+
             ta.recycle()
+
+            axisPaint.color = axisColor
+            textPaint.color = textColor
         }
     }
 
@@ -119,7 +142,8 @@ class BarGraphView @JvmOverloads constructor(
         maxY: Float
     ) {
         val barCount = bars[0].xValues.size
-        val groupWidth = (width - 150f) / barCount
+        val graphWidth = width - leftPadding - rightPadding
+        val groupWidth = graphWidth / barCount
         val barWidth = groupWidth / bars.size * 0.7f
 
         bars.forEachIndexed { dataIndex, data ->
@@ -127,19 +151,19 @@ class BarGraphView @JvmOverloads constructor(
                 if (data.color != Color.TRANSPARENT) data.color
                 else defaultBarColor
 
-
-            data.xValues.forEachIndexed { index, xVal ->
+            data.yValues.forEachIndexed { index, value ->
                 val left =
-                    100f + index * groupWidth + dataIndex * barWidth
+                    leftPadding + index * groupWidth + dataIndex * barWidth
                 val right = left + barWidth
 
-                val top = mapY(data.yValues[index], minY, maxY)
-                val bottom = height - 100f
+                val top = mapY(value, minY, maxY)
+                val bottom = height - bottomPadding
 
                 canvas.drawRect(left, top, right, bottom, barPaint)
             }
         }
     }
+
 
     // ================= TOOLTIP =================
     private fun drawBarTooltip(
@@ -164,12 +188,22 @@ class BarGraphView @JvmOverloads constructor(
 
         val text = bars[setIndex].yValues[barIndex].toString()
         val textWidth = tooltipPaint.measureText(text)
+        val padding = 12f
+
+        val rawLeft = cx - textWidth / 2 - padding
+        val rawRight = cx + textWidth / 2 + padding
+        val rawTop = top - 60f
+
+        val tooltipLeft = rawLeft.coerceAtLeast(leftPadding)
+        val tooltipRight = rawRight.coerceAtMost(width - rightPadding)
+        val tooltipTop = rawTop.coerceAtLeast(topPadding)
+        val tooltipBottom = tooltipTop + 40f
 
         canvas.drawRoundRect(
-            cx - textWidth / 2 - 12f,
-            cy - 50f,
-            cx + textWidth / 2 + 12f,
-            cy,
+            tooltipLeft,
+            tooltipTop,
+            tooltipRight,
+            tooltipBottom,
             12f,
             12f,
             tooltipBgPaint
@@ -177,10 +211,11 @@ class BarGraphView @JvmOverloads constructor(
 
         canvas.drawText(
             text,
-            cx - textWidth / 2,
-            cy - 15f,
+            tooltipLeft + padding,
+            tooltipBottom - 12f,
             tooltipPaint
         )
+
     }
 
     // ================= TOUCH =================
@@ -227,9 +262,25 @@ class BarGraphView @JvmOverloads constructor(
 
     // ================= AXES & UTILS =================
     private fun drawAxes(canvas: Canvas) {
-        canvas.drawLine(100f, height - 100f, width - 50f, height - 100f, axisPaint)
-        canvas.drawLine(100f, 50f, 100f, height - 100f, axisPaint)
+        // X axis
+        canvas.drawLine(
+            leftPadding,
+            height - bottomPadding,
+            width - rightPadding,
+            height - bottomPadding,
+            axisPaint
+        )
+
+        // Y axis
+        canvas.drawLine(
+            leftPadding,
+            topPadding,
+            leftPadding,
+            height - bottomPadding,
+            axisPaint
+        )
     }
+
 
     private fun drawGrid(canvas: Canvas) {
         val steps = 5
@@ -273,9 +324,11 @@ class BarGraphView @JvmOverloads constructor(
     }
 
     private fun mapY(value: Float, min: Float, max: Float): Float {
-        return (height - 100f) -
-                ((value - min) / (max - min)) * (height - 150f)
+        return (height - bottomPadding) -
+                ((value - min) / (max - min)) *
+                (height - topPadding - bottomPadding)
     }
+
 
     private fun drawLegend(canvas: Canvas) {
         val startX = width - 250f
@@ -312,4 +365,9 @@ class BarGraphView @JvmOverloads constructor(
         bars.addAll(data)
         invalidate()
     }
+
+    fun setBar(data: LineData) {
+        setBars(listOf(data))
+    }
+
 }

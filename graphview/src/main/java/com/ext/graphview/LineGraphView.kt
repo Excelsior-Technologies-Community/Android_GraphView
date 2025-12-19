@@ -23,6 +23,11 @@ class LineGraphView @JvmOverloads constructor(
     // Pair<lineIndex, pointIndex>
     private var showLegend = true
     private var activeLineIndex: Int? = null
+    private var defaultLineColor: Int = Color.BLUE
+    private val leftPadding = 100f
+    private val rightPadding = 80f   // increased
+    private val topPadding = 80f     // increased
+    private val bottomPadding = 120f // increased (labels + tooltip)
 
 
 
@@ -110,6 +115,12 @@ class LineGraphView @JvmOverloads constructor(
                 true
             )
 
+            defaultLineColor = typedArray.getColor(
+                R.styleable.LineGraphView_lineColor,
+                Color.BLUE
+            )
+
+
 
             typedArray.recycle()
         }
@@ -139,7 +150,10 @@ class LineGraphView @JvmOverloads constructor(
         // 4️⃣ Draw lines + points
         lines.forEachIndexed { index, line ->
             // Draw line
-            linePaint.color = line.color
+            linePaint.color =
+                if (line.color != Color.TRANSPARENT) line.color
+                else defaultLineColor
+
             drawAnimatedLine(
                 canvas,
                 line.xValues,
@@ -170,7 +184,10 @@ class LineGraphView @JvmOverloads constructor(
             val y = mapY(line.yValues[pointIndex], minY, maxY)
 
             // Highlight point
-            linePaint.color = line.color
+            linePaint.color =
+                if (line.color != Color.TRANSPARENT) line.color
+                else defaultLineColor
+
             canvas.drawCircle(x, y, 10f, linePaint)
 
             // Tooltip text
@@ -179,15 +196,27 @@ class LineGraphView @JvmOverloads constructor(
             val textWidth = tooltipPaint.measureText(text)
 
             // Tooltip background
+            val tooltipLeft = (x - textWidth / 2 - padding)
+                .coerceAtLeast(leftPadding)
+
+            val tooltipRight = (x + textWidth / 2 + padding)
+                .coerceAtMost(width - rightPadding)
+
+            val tooltipTop = (y - 80f)
+                .coerceAtLeast(topPadding)
+
+            val tooltipBottom = tooltipTop + 40f
+
             canvas.drawRoundRect(
-                x - textWidth / 2 - padding,
-                y - 80f,
-                x + textWidth / 2 + padding,
-                y - 40f,
+                tooltipLeft,
+                tooltipTop,
+                tooltipRight,
+                tooltipBottom,
                 12f,
                 12f,
                 tooltipBgPaint
             )
+
 
             // Tooltip text
             canvas.drawText(
@@ -210,19 +239,19 @@ class LineGraphView @JvmOverloads constructor(
     private fun drawAxes(canvas: Canvas) {
         // X axis
         canvas.drawLine(
-            100f,
-            height - 100f,
-            width - 50f,
-            height - 100f,
+            leftPadding,
+            height - bottomPadding,
+            width - rightPadding,
+            height - bottomPadding,
             axisPaint
         )
 
         // Y axis
         canvas.drawLine(
-            100f,
-            50f,
-            100f,
-            height - 100f,
+            leftPadding,
+            topPadding,
+            leftPadding,
+            height - bottomPadding,
             axisPaint
         )
     }
@@ -296,6 +325,11 @@ class LineGraphView @JvmOverloads constructor(
         startAnimation()
     }
 
+    fun setLine(data: LineData) {
+        setLines(listOf(data))
+    }
+
+
 
     // ================= ANIMATION =================
     private fun startAnimation() {
@@ -310,31 +344,49 @@ class LineGraphView @JvmOverloads constructor(
 
     // ================= MAPPING =================
     private fun mapX(value: Float, min: Float, max: Float): Float {
-        return 100f + ((value - min) / (max - min)) * (width - 150f)
+        return leftPadding +
+                ((value - min) / (max - min)) *
+                (width - leftPadding - rightPadding)
     }
 
     private fun mapY(value: Float, min: Float, max: Float): Float {
-        return (height - 100f) -
-                ((value - min) / (max - min)) * (height - 150f)
+        return (height - bottomPadding) -
+                ((value - min) / (max - min)) *
+                (height - topPadding - bottomPadding)
     }
+
+
 
     private fun drawGrid(canvas: Canvas) {
         val steps = 5
-        val graphWidth = width - 150f
-        val graphHeight = height - 150f
+        val graphWidth = width - leftPadding - rightPadding
+        val graphHeight = height - topPadding - bottomPadding
 
-        // Horizontal grid
+        // Horizontal grid lines
         for (i in 0..steps) {
-            val y = 50f + (graphHeight / steps) * i
-            canvas.drawLine(100f, y, width - 50f, y, gridPaint)
+            val y = topPadding + (graphHeight / steps) * i
+            canvas.drawLine(
+                leftPadding,
+                y,
+                width - rightPadding,
+                y,
+                gridPaint
+            )
         }
 
-        // Vertical grid
+        // Vertical grid lines
         for (i in 0..steps) {
-            val x = 100f + (graphWidth / steps) * i
-            canvas.drawLine(x, 50f, x, height - 100f, gridPaint)
+            val x = leftPadding + (graphWidth / steps) * i
+            canvas.drawLine(
+                x,
+                topPadding,
+                x,
+                height - bottomPadding,
+                gridPaint
+            )
         }
     }
+
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (lines.isEmpty()) return false

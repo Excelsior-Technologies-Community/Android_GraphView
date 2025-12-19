@@ -56,6 +56,25 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
+        val lineGraph = findViewById<LineGraphView>(R.id.linegraph)
+
+        lineGraph.setLine(
+            LineData(
+                xValues = listOf(0f, 1f, 2f, 3f),
+                yValues = listOf(20f, 30f, 50f, 40f),
+            )
+        )
+
+        val bargraph1 = findViewById<BarGraphView>(R.id.bargraph1)
+
+        bargraph1.setBar(
+            LineData(
+                xValues = listOf(0f, 1f, 2f),
+                yValues = listOf(50f, 70f, 40f)
+            )
+        )
+
+
 
     }
 }
