@@ -6,10 +6,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.ext.graphview.BarGraphView
 import com.ext.graphview.LineData
 import com.ext.graphview.LineGraphView
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var barGraph: BarGraphView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,6 +38,24 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         )
+
+        barGraph = findViewById(R.id.bargraph)
+
+        barGraph.setBars(
+            listOf(
+                LineData(
+                    xValues = listOf(0f, 1f, 2f, 3f),
+                    yValues = listOf(50f, 70f, 40f, 90f),
+                    color = Color.YELLOW
+                ),
+                LineData(
+                    xValues = listOf(0f, 1f, 2f, 3f),
+                    yValues = listOf(30f, 60f, 80f, 50f),
+                    color = Color.BLUE
+                )
+            )
+        )
+
 
     }
 }

@@ -19,5 +19,13 @@
         app:showGrid="true"
         app:showLegend="true" />
 
+    <com.ext.graphview.BarGraphView
+        android:id="@+id/bargraph"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:showGrid="true"
+        app:barColor="@android:color/holo_orange_light"
+        app:showLegend="true"/>
+
 
 </LinearLayout>

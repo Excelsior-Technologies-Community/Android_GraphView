@@ -436,6 +436,9 @@ class LineGraphView @JvmOverloads constructor(
         val spacing = 20f
 
         lines.forEach { line ->
+            // ⛔ Skip legend item if label is empty or blank
+            if (line.label.isBlank()) return@forEach
+
             // Color box
             legendBoxPaint.color = line.color
             canvas.drawRect(
@@ -446,7 +449,7 @@ class LineGraphView @JvmOverloads constructor(
                 legendBoxPaint
             )
 
-            // Label
+            // Label text
             canvas.drawText(
                 line.label,
                 startX + boxSize + 16f,
@@ -457,6 +460,7 @@ class LineGraphView @JvmOverloads constructor(
             startY += boxSize + spacing
         }
     }
+
 
 
 
